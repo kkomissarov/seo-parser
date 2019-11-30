@@ -43,7 +43,6 @@ def write_page_info(response, source=None):
         print(f'Warning! Результат для страницы {response.url} уже собран.')
 
 
-
 def write_redirect_in_queue(response):
     redirect_url = response.headers['Location']
     similar_queue_item = db_session.query(QueueItem).filter(QueueItem.url == redirect_url).first()
@@ -63,7 +62,7 @@ def write_page_links_in_queue(response):
             db_session.commit()
 
 
-def run_crawler(domain, speed=1, verify_ssl=True):
+def run_crawler(domain, speed=0.1, verify_ssl=True):
     db_session.query(CrawlerItem).delete()
     db_session.query(QueueItem).delete()
     first_queue_item = QueueItem(domain)
@@ -73,7 +72,12 @@ def run_crawler(domain, speed=1, verify_ssl=True):
     while db_session.query(QueueItem).first():
         sleep(speed)
         current_queue_item = db_session.query(QueueItem).first()
-        response = requests.get(current_queue_item.url, allow_redirects=False, verify=verify_ssl)
+        response = requests.get(
+            current_queue_item.url,
+            headers={'User-Agent': 'MrnrBot/1.0'},
+            allow_redirects=False,
+            verify=verify_ssl
+        )
         write_page_info(response, current_queue_item.source)
 
         if response.is_redirect:
@@ -83,6 +87,5 @@ def run_crawler(domain, speed=1, verify_ssl=True):
             write_page_links_in_queue(response)
 
         db_session.delete(current_queue_item)
-
-    print('Парсинг завершен')
+        db_session.commit()
 

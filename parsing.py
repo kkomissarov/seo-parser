@@ -11,9 +11,9 @@ def get_page_info(response):
     response_code = response.status_code
     page_url = response.url
     title_tag = soup.find('title')
-    title_text = title_tag.text if title_tag else None
+    title_text = title_tag.text.strip() if title_tag else None
     description_tag = soup.find('meta', attrs={'name': 'description'})
-    description_text = description_tag.get('content') if description_tag else None
+    description_text = description_tag.get('content').strip() if description_tag else None
     page_info_dict = {
         'url': page_url,
         'response_code': response_code,

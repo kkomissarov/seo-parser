@@ -1,3 +1,5 @@
+#!/home/kkomissarov/projects/seo-parser/venv/bin/python
+
 from models import Base
 from utils import get_url_from_terminal
 from parsing import run_crawler
